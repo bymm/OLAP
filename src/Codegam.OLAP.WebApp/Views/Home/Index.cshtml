@@ -1,0 +1,57 @@
+﻿@model Codegam.OLAP.WebApp.Models.Home.IndexModel
+@using Codegam.OLAP.Web
+@{
+    ViewBag.Title = "Pivot table demo";    
+}
+<style type="text/css">
+    body
+    {
+        font-size: 1em;
+        font-family: Tahoma, Verdana, sans-serif;
+    }
+    .olap-pivot-table
+    {
+        margin: 10px;
+        float: left;
+    }
+    
+    .olap-pivot-table .title
+    {
+        font-size: 1.2em;
+        font-weight: bold;
+        margin: 0 0 10px 0;
+    }
+        .olap-pivot-table table
+        {
+            border-collapse:collapse;
+            border: 1px solid #333;
+        }
+
+        .olap-pivot-table table tr.total
+        {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .olap-pivot-table table th
+        {
+            padding: 5px;
+            font-weight: bold;
+            color: #FFF;
+            background: #333;
+        }
+
+        .olap-pivot-table table td
+        {
+            padding: 5px;
+            vertical-align: top;
+        }
+
+            .olap-pivot-table table td.value
+            {
+                background: #E8E8E8;
+            }
+</style>
+<h2>Pivot table demo</h2>
+@Html.PivotTable(Model.UserBankTable, "Group by user type, bank")
+@Html.PivotTable(Model.DateBankTable, "Group by month, bank")
