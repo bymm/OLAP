@@ -5,6 +5,11 @@ using System.Text;
 
 namespace Codegam.OLAP
 {
+    public enum SortOrder
+    {
+        Asc, Desc
+    }
+
     public class GroupSpec<T> : IGroupBuilder
     {
         OlapCube Cube { get; set; }
@@ -12,6 +17,8 @@ namespace Codegam.OLAP
         Func<IOlapDataVector, IComparable> KeySelector { get; set; }
         Func<IOlapDataVector, string> NameSelector { get; set; }
         Func<IOlapDataVector, string> TotalSelector { get; set; }
+        SortOrder SortOrder { get; set; }
+        bool Ascending { get; set; }
         ShowTotal ShowTotal { get; set; }
 
         internal GroupSpec(OlapCube cube, Func<IOlapDataVector, object> groupSelector)
@@ -21,6 +28,7 @@ namespace Codegam.OLAP
             KeySelector = v => groupSelector(v) as IComparable;
             NameSelector = v => Convert.ToString(groupSelector(v));
             ShowTotal = ShowTotal.Top;
+            SortOrder = OLAP.SortOrder.Asc;
         }
 
         public GroupSpec<T> KeyGroupAs(Func<T, IComparable> keySelector)
@@ -29,9 +37,21 @@ namespace Codegam.OLAP
             return this;
         }
 
+        public GroupSpec<T> NameGroupAs(Func<IOlapDataVector, string> nameSelector)
+        {
+            NameSelector = nameSelector;
+            return this;
+        }
+
         public GroupSpec<T> NameGroupAs(Func<T, string> nameSelector)
         {
             NameSelector = v => nameSelector((T)GroupSelector(v));
+            return this;
+        }
+
+        public GroupSpec<T> OrderByDescending()
+        {
+            SortOrder = SortOrder.Desc;
             return this;
         }
 
@@ -92,7 +112,7 @@ namespace Codegam.OLAP
             IComparable groupKey = KeySelector(dataVector);
             string groupName = NameSelector(dataVector);
             string totalName = TotalSelector == null ? "" : TotalSelector(dataVector);
-            return new PivotBaseGroup.Group(groupKey, groupName, ShowTotal, totalName);
+            return new PivotBaseGroup.Group(groupKey, groupName, ShowTotal, totalName, SortOrder);
         }
     }
 }

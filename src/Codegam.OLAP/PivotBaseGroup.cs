@@ -14,13 +14,26 @@ namespace Codegam.OLAP
         public ShowTotal ShowTotal { get; private set; }
         public string TotalName { get; private set; }
 
-        protected PivotBaseGroup(ITotalSpec totalSpec, IEnumerable<IAggregator> aggregators)
+        public SortOrder SortOrder { get; internal set; }
+
+        internal PivotBaseGroup(ITotalSpec totalSpec, IEnumerable<IAggregator> aggregators, SortOrder sortOrder)
         {
             ShowTotal = totalSpec.ShowTotal;
             TotalName = totalSpec.TotalName;
             Aggregators = new List<IAggregator>(aggregators.Select(a => a.CleanClone()));
             GroupList = new List<PivotTableGroup>();
-            GroupMap = new Dictionary<IComparable, PivotTableGroup>();            
+            GroupMap = new Dictionary<IComparable, PivotTableGroup>();
+            SortOrder = sortOrder;
+        }
+        
+        public IEnumerable<PivotTableGroup> Groups
+        {
+            get
+            {
+                if (SortOrder == SortOrder.Desc)
+                    return GroupList.OrderByDescending(g => g.Key);
+                return GroupList.OrderBy(g => g.Key);
+            }
         }
 
         public IEnumerable<string> FormatValues
@@ -60,7 +73,7 @@ namespace Codegam.OLAP
         internal void Process(IOlapDataVector dataVector, IEnumerable<IGroup> groupList)
         {
             Aggregators.ForEach(a => a.Aggregate(dataVector));
-            IGroup group = groupList.FirstOrDefault();
+            var group = groupList.FirstOrDefault();
             if (group == null)
                 return;
             GetOrCreateGroup(group).Process(dataVector, groupList.Skip(1));
@@ -72,7 +85,7 @@ namespace Codegam.OLAP
             {
                 if (NullKeyGroup == null)
                 {
-                    NullKeyGroup = new PivotTableGroup(group, Aggregators);
+                    NullKeyGroup = new PivotTableGroup(group, Aggregators, group.SortOrder);
                     GroupList.Add(NullKeyGroup);
                 }
                 return NullKeyGroup;
@@ -80,7 +93,7 @@ namespace Codegam.OLAP
             PivotTableGroup result;
             if (GroupMap.TryGetValue(group.Key, out result))
                 return result;
-            result = new PivotTableGroup(group, Aggregators);
+            result = new PivotTableGroup(group, Aggregators, group.SortOrder);
             GroupList.Add(result);
             GroupMap[group.Key] = result;
             return result;
@@ -93,12 +106,15 @@ namespace Codegam.OLAP
             public ShowTotal ShowTotal { get; private set; }
             public string TotalName { get; private set; }
 
-            internal Group(IComparable key, string name, ShowTotal showTotalPosition, string totalName)
+            public SortOrder SortOrder { get; private set; }
+
+            internal Group(IComparable key, string name, ShowTotal showTotalPosition, string totalName, SortOrder sortOrder )
             {
                 Key = key;
                 Name = name;
                 ShowTotal = showTotalPosition;
                 TotalName = totalName;
+                SortOrder = sortOrder;
             }
         }
     }

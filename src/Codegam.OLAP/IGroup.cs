@@ -8,6 +8,7 @@ namespace Codegam.OLAP
     public interface IGroup : ITotalSpec
     {
         IComparable Key { get; }
-        string Name { get; }        
+        string Name { get; }
+        SortOrder SortOrder { get; }
     }
 }

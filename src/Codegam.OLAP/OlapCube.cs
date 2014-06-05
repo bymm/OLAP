@@ -51,7 +51,7 @@ namespace Codegam.OLAP
 
         internal GroupSpec<T> ThenBy<T>(Func<IOlapDataVector, object> groupSelector, string title = "")
         {
-            GroupSpec<T> result = new GroupSpec<T>(this, groupSelector);
+            var result = new GroupSpec<T>(this, groupSelector);
             GroupBuilders.Add(result);
             GroupTitles.Add(title);
             return result;
@@ -123,17 +123,20 @@ namespace Codegam.OLAP
         
         public PivotTable PreparePivotTable(OlapDataSource dataSource)
         {
-            PivotTable result = new PivotTable(this, Aggregators, GroupTitles, ValueTitles);            
+            var result = new PivotTable(this, Aggregators, SortOrder.Asc, GroupTitles, ValueTitles);            
             foreach (var dataVector in dataSource)
             {
-                result.Process(dataVector, ResolveGroups(dataVector));
+                var groups = ResolveGroups(dataVector).ToList();
+                if (groups.Any())
+                    result.SortOrder = groups.First().SortOrder;
+                result.Process(dataVector, groups);
             }
             return result;
         }
 
         IEnumerable<IGroup> ResolveGroups(IOlapDataVector dataVector)
         {
-            return GroupBuilders.Select(groupSpec => groupSpec.Build(dataVector));
+            return GroupBuilders.Select(groupBuilder => groupBuilder.Build(dataVector));
         }
     }
 }

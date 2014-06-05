@@ -10,7 +10,7 @@ namespace Codegam.OLAP.Web
     {
         public static string RenderHtmlTable(this PivotTable pivotTable, string title = "")
         {
-            TagBuilder builder = new TagBuilder("div");
+            var builder = new TagBuilder("div");
             builder.AddCssClass("olap-pivot-table");
             builder.InnerHtml = BuildTitle(title) + BuildTable(pivotTable);
             return builder.ToString();
@@ -25,7 +25,7 @@ namespace Codegam.OLAP.Web
 
         private static string BuildTable(PivotTable pivotTable)
         {
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
             builder.Append(@"<table border=""1"">");
             BuildHeader(pivotTable, builder);
             BuildBody(pivotTable, builder);            
@@ -48,7 +48,7 @@ namespace Codegam.OLAP.Web
             builder.Append("<tbody>");
             if (pivotTable.ShowTotal == ShowTotal.Top)
                 BuildTotal(pivotTable, builder);
-            Stack<bool> startRow = new Stack<bool>();
+            var startRow = new Stack<bool>();
             BuildGroups(pivotTable.Groups, 0, pivotTable.GroupTitles.Count(), startRow, builder);
             if (pivotTable.ShowTotal == ShowTotal.Bottom)
                 BuildTotal(pivotTable, builder);
@@ -61,6 +61,17 @@ namespace Codegam.OLAP.Web
                 BuildGroup(group, level, levels, startRow, builder);
         }
 
+        private static int GetRowSpan(PivotTableGroup group)
+        {
+            return group.Groups.Sum(cg => GetRowSpanIncludingTotals(cg));
+        }
+
+        private static int GetRowSpanIncludingTotals(PivotTableGroup group)
+        {
+            var childRowSpans = group.Groups.Sum(cg => GetRowSpanIncludingTotals(cg));
+            return Math.Max(childRowSpans, 1) + (/*group.ShowTotal == ShowTotal.Bottom &&*/ !group.ContainsNoOrSingleChild(true) ? 1 : 0);
+        }
+
         private static void BuildGroup(PivotTableGroup group, int level, int levels, Stack<bool> startRow, StringBuilder builder)
         {
             if (startRow.Count == 0)
@@ -69,7 +80,7 @@ namespace Codegam.OLAP.Web
                 startRow.Push(true);
             }
 
-            int rowSpan = group.Count + (group.HasChildGroups && group.ShowTotal == ShowTotal.Top ? 1 : 0);
+            int rowSpan = GetRowSpan(group);
             builder.AppendFormat(@"<td{1} class=""group"">{0}</td>", group.Name, rowSpan > 1 ? string.Format(@" rowSpan=""{0}""", rowSpan) : "");
 
             if (group.ShowTotal == ShowTotal.Top)
@@ -80,7 +91,7 @@ namespace Codegam.OLAP.Web
                 startRow.Pop();
             }
 
-            BuildGroups(group.ChildGroups, level + 1, levels, startRow, builder);
+            BuildGroups(group.Groups, level + 1, levels, startRow, builder);
 
             if (group.ShowTotal == ShowTotal.Bottom && !group.HasChildGroups)
             {

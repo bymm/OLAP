@@ -7,16 +7,11 @@ namespace Codegam.OLAP
 {
     public class PivotTable : PivotBaseGroup
     {
-        internal PivotTable(ITotalSpec totalSpec, IEnumerable<IAggregator> aggregators, IEnumerable<string> groupTitles, IEnumerable<string> valueTitles)
-            : base(totalSpec, aggregators)
+        internal PivotTable(ITotalSpec totalSpec, IEnumerable<IAggregator> aggregators, SortOrder sortOrder, IEnumerable<string> groupTitles, IEnumerable<string> valueTitles)
+            : base(totalSpec, aggregators, sortOrder)
         {
             GroupTitles = groupTitles;
             ValueTitles = valueTitles;
-        }
-
-        public IEnumerable<PivotTableGroup> Groups
-        {
-            get { return GroupList; }
         }
 
         public IEnumerable<string> GroupTitles { get; private set; }

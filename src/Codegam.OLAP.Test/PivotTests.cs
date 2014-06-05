@@ -23,6 +23,7 @@ namespace Codegam.OLAP.Test
                                         .NameGroupAs(ut => ut == UserType.Private ? "Private users" : "Corporate users")
                                     .ThenBy<string>(v => v[1])
                                         .KeyGroupAs(b => (b ?? "").ToLower())
+                                        .NameGroupAs(b => (b ?? "").ToUpper())
                                     .Sum<int>(v => v[3])
                                     .Min<int>(v => v[3])
                                     .Max<int>(v => v[3])
@@ -45,23 +46,23 @@ namespace Codegam.OLAP.Test
             privateUsersGroup.Value<double>(3).Should().BeInRange(7.0 / 3 - 0.01, 7.0 / 3 + 0.01);
             privateUsersGroup.Value<int>(4).Should().Be(3);
             
-            privateUsersGroup.ChildGroups.Should().HaveCount(2);
+            privateUsersGroup.Groups.Should().HaveCount(2);
 
-            privateUsersGroup.ChildGroups.First().Key.Should().Be("bpb");
-            privateUsersGroup.ChildGroups.First().Name.Should().Be("BPB");
-            privateUsersGroup.ChildGroups.First().Value<int>(0).Should().Be(3);
-            privateUsersGroup.ChildGroups.First().Value<int>(1).Should().Be(1);
-            privateUsersGroup.ChildGroups.First().Value<int>(2).Should().Be(2);
-            privateUsersGroup.ChildGroups.First().Value<double>(3).Should().BeInRange(3.0 / 2 - 0.01, 3.0 / 2 + 0.01);
-            privateUsersGroup.ChildGroups.First().Value<int>(4).Should().Be(2);
+            privateUsersGroup.Groups.First().Key.Should().Be("bpb");
+            privateUsersGroup.Groups.First().Name.Should().Be("BPB");
+            privateUsersGroup.Groups.First().Value<int>(0).Should().Be(3);
+            privateUsersGroup.Groups.First().Value<int>(1).Should().Be(1);
+            privateUsersGroup.Groups.First().Value<int>(2).Should().Be(2);
+            privateUsersGroup.Groups.First().Value<double>(3).Should().BeInRange(3.0 / 2 - 0.01, 3.0 / 2 + 0.01);
+            privateUsersGroup.Groups.First().Value<int>(4).Should().Be(2);
 
-            privateUsersGroup.ChildGroups.Last().Key.Should().Be("bpu");
-            privateUsersGroup.ChildGroups.Last().Name.Should().Be("BPU");
-            privateUsersGroup.ChildGroups.Last().Value<int>(0).Should().Be(4);
-            privateUsersGroup.ChildGroups.Last().Value<int>(1).Should().Be(4);
-            privateUsersGroup.ChildGroups.Last().Value<int>(2).Should().Be(4);
-            privateUsersGroup.ChildGroups.Last().Value<double>(3).Should().BeInRange(4 - 0.01, 4 + 0.01);
-            privateUsersGroup.ChildGroups.Last().Value<int>(4).Should().Be(1);
+            privateUsersGroup.Groups.Last().Key.Should().Be("bpu");
+            privateUsersGroup.Groups.Last().Name.Should().Be("BPU");
+            privateUsersGroup.Groups.Last().Value<int>(0).Should().Be(4);
+            privateUsersGroup.Groups.Last().Value<int>(1).Should().Be(4);
+            privateUsersGroup.Groups.Last().Value<int>(2).Should().Be(4);
+            privateUsersGroup.Groups.Last().Value<double>(3).Should().BeInRange(4 - 0.01, 4 + 0.01);
+            privateUsersGroup.Groups.Last().Value<int>(4).Should().Be(1);
 
             var corporateUsersGroup = table.Groups.Last();
             corporateUsersGroup.Key.Should().Be(UserType.Corporate);
@@ -72,56 +73,56 @@ namespace Codegam.OLAP.Test
             corporateUsersGroup.Value<double>(3).Should().BeInRange(11.0 / 3 - 0.01, 11.0 / 3 + 0.01);
             corporateUsersGroup.Value<int>(4).Should().Be(3);
 
-            corporateUsersGroup.ChildGroups.Should().HaveCount(3);
+            corporateUsersGroup.Groups.Should().HaveCount(3);
 
-            corporateUsersGroup.ChildGroups.First().Key.Should().Be("bpb");
-            corporateUsersGroup.ChildGroups.First().Name.Should().Be("BPB");
-            corporateUsersGroup.ChildGroups.First().Value<int>(0).Should().Be(6);
-            corporateUsersGroup.ChildGroups.First().Value<int>(1).Should().Be(6);
-            corporateUsersGroup.ChildGroups.First().Value<int>(2).Should().Be(6);
-            corporateUsersGroup.ChildGroups.First().Value<double>(3).Should().BeInRange(6 - 0.01, 6 + 0.01);
-            corporateUsersGroup.ChildGroups.First().Value<int>(4).Should().Be(1);
-
-            corporateUsersGroup.ChildGroups.Last().Key.Should().Be("bnp");
-            corporateUsersGroup.ChildGroups.Last().Name.Should().Be("BNP");
-            corporateUsersGroup.ChildGroups.Last().Value<int>(0).Should().Be(3);
-            corporateUsersGroup.ChildGroups.Last().Value<int>(1).Should().Be(3);
-            corporateUsersGroup.ChildGroups.Last().Value<int>(2).Should().Be(3);
-            corporateUsersGroup.ChildGroups.Last().Value<double>(3).Should().BeInRange(3 - 0.01, 3 + 0.01);
-            corporateUsersGroup.ChildGroups.Last().Value<int>(4).Should().Be(1);
+            corporateUsersGroup.Groups.First().Key.Should().Be("bnp");
+            corporateUsersGroup.Groups.First().Name.Should().Be("BNP");
+            corporateUsersGroup.Groups.First().Value<int>(0).Should().Be(3);
+            corporateUsersGroup.Groups.First().Value<int>(1).Should().Be(3);
+            corporateUsersGroup.Groups.First().Value<int>(2).Should().Be(3);
+            corporateUsersGroup.Groups.First().Value<double>(3).Should().BeInRange(3 - 0.01, 3 + 0.01);
+            corporateUsersGroup.Groups.First().Value<int>(4).Should().Be(1);
+            
+            corporateUsersGroup.Groups.Last().Key.Should().Be("bpu");
+            corporateUsersGroup.Groups.Last().Name.Should().Be("BPU");
+            corporateUsersGroup.Groups.Last().Value<int>(0).Should().Be(2);
+            corporateUsersGroup.Groups.Last().Value<int>(1).Should().Be(2);
+            corporateUsersGroup.Groups.Last().Value<int>(2).Should().Be(2);
+            corporateUsersGroup.Groups.Last().Value<double>(3).Should().BeInRange(2 - 0.01, 2 + 0.01);
+            corporateUsersGroup.Groups.Last().Value<int>(4).Should().Be(1);
         }
 
         private static OlapDataSource CreateTestSource()
         {
-            OlapDataSource dataSource = new OlapDataSource();
-            dataSource.Add(UserType.Private, "BPB", new DateTime(2013, 8, 1), 1);
+            var dataSource = new OlapDataSource();
             dataSource.Add(UserType.Private, "bpb", new DateTime(2013, 9, 12), 2);
             dataSource.Add(UserType.Private, "BPU", new DateTime(2013, 9, 12), 4);
             dataSource.Add(UserType.Corporate, "BPB", new DateTime(2013, 9, 4), 6);
             dataSource.Add(UserType.Corporate, "BPU", new DateTime(2013, 8, 1), 2);
             dataSource.Add(UserType.Corporate, "BNP", new DateTime(2013, 8, 1), 3);
+            dataSource.Add(UserType.Private, "BPB", new DateTime(2013, 8, 1), 1);
             return dataSource;
         }
 
         [TestMethod]
         public void GroupByBankWithNull()
         {
-            OlapDataSource dataSource = new OlapDataSource();
+            var dataSource = new OlapDataSource();
             dataSource.Add(UserType.Private, "bpb", new DateTime(2013, 8, 1), 1);
             dataSource.Add(UserType.Private, null, new DateTime(2013, 9, 2), 2);
-            OlapCube cube = new OlapCube()
+            var cube = new OlapCube()
                                     .GroupBy<string>(v => v[1])
                                         .NameGroupAs(b => (b ?? "").ToUpper())
                                     .Sum<int>(v => v[3]);
-            PivotTable table = cube.PreparePivotTable(dataSource);
+            var table = cube.PreparePivotTable(dataSource);
             table.Value<int>(0).Should().Be(3);
             table.Groups.Should().HaveCount(2);
             var group = table.Groups.First();
-            group.Key.Should().Be("bpb");
-            group.Name.Should().Be("BPB");
-            group = table.Groups.Last();
             group.Key.Should().BeNull();
             group.Name.Should().Be("");
+            group = table.Groups.Last();
+            group.Key.Should().Be("bpb");
+            group.Name.Should().Be("BPB");
         }
 
         [TestMethod]
@@ -143,8 +144,8 @@ namespace Codegam.OLAP.Test
             monthGroup.Key.Should().Be(2013 * 12 + 8);
             monthGroup.Name.Should().Be("Aug 2013");
             monthGroup.Value<int>(0).Should().Be(6);
-            monthGroup.ChildGroups.Should().HaveCount(1);
-            var dateGroup = monthGroup.ChildGroups.First();
+            monthGroup.Groups.Should().HaveCount(1);
+            var dateGroup = monthGroup.Groups.First();
             dateGroup.Key.Should().Be(new DateTime(2013, 8, 1));
             dateGroup.Name.Should().Be("01/08/2013");
             dateGroup.Value<int>(0).Should().Be(6);
@@ -153,10 +154,10 @@ namespace Codegam.OLAP.Test
             monthGroup.Key.Should().Be(2013 * 12 + 9);
             monthGroup.Name.Should().Be("Sep 2013");
             monthGroup.Value<int>(0).Should().Be(12);
-            monthGroup.ChildGroups.Should().HaveCount(2);
-            dateGroup = monthGroup.ChildGroups.First();
-            dateGroup.Key.Should().Be(new DateTime(2013, 9, 12));
-            dateGroup.Name.Should().Be("12/09/2013");
+            monthGroup.Groups.Should().HaveCount(2);
+            dateGroup = monthGroup.Groups.First();
+            dateGroup.Key.Should().Be(new DateTime(2013, 9, 4));
+            dateGroup.Name.Should().Be("04/09/2013");
             dateGroup.Value<int>(0).Should().Be(6);
         }
 

@@ -10,16 +10,11 @@ namespace Codegam.OLAP
         public IComparable Key { get; private set; }
         public string Name { get; private set; }        
 
-        public PivotTableGroup(IGroup group, IEnumerable<IAggregator> aggregators)
-            : base(group, aggregators)
+        internal PivotTableGroup(IGroup group, IEnumerable<IAggregator> aggregators, SortOrder sortOrder)
+            : base(group, aggregators, sortOrder)
         {
             Key = group.Key;
             Name = group.Name;            
-        }
-
-        public IEnumerable<PivotTableGroup> ChildGroups
-        {
-            get { return GroupList; }
         }
     }
 }
